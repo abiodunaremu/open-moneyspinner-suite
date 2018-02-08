@@ -1,0 +1,3882 @@
+DROP DATABASE IF EXISTS milliscriptmoneyspinnerasxtrial;
+
+CREATE DATABASE milliscriptmoneyspinnerasxtrial;
+
+USE milliscriptmoneyspinnerasxtrial;
+
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Country`
+(
+cCountryCode char(3) not null PRIMARY KEY,
+vCountryName varchar(20) not null UNIQUE
+);
+
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Currency`
+(
+cCurrencyCode char(9)not null,
+vCurrencyName varchar(9) unique not null,
+PRIMARY KEY (cCurrencyCode)
+);
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Department`
+(
+cDepartmentCode char(9)not null,
+vDepartmentName varchar(50) unique not null,
+PRIMARY KEY (cDepartmentCode)
+);
+
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Designation`
+(
+cDesignationCode char(9)not null
+PRIMARY KEY,
+vDesignationName varchar(50) unique not null,
+mAccountBalance decimal(50,2) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Note`
+(
+cMerchantID char(9)not null
+PRIMARY KEY,
+tNote text not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Bank`
+(
+cBankCode char(9)not null
+PRIMARY KEY ,
+vName varchar(40) unique not null,
+vAddress varchar(80),
+cCity char(10),
+cState char(10),
+cCountryCode Char(3),
+cZip char(5),
+cPhone char(15) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ItemCategory`
+(
+cItemCategoryCode char(9)not null
+PRIMARY KEY ,
+vCategoryName varchar(50) unique not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ItemLocation`
+(
+cItemLocationCode char(9)not null
+PRIMARY KEY ,
+vLocationName varchar(50) unique not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ItemUnit`
+(
+cItemUnitCode char(9)not null
+PRIMARY KEY,
+vItemUnitName varchar(50) unique not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ItemUnitConversion`
+(
+cItemUnitConversionCode char(9)not null
+PRIMARY KEY ,
+cSuperItemUnitCode char(9) not null
+REFERENCES ItemUnit(cItemUnitCode),
+cSubItemUnitCode char(9) not null
+REFERENCES ItemUnit(cItemUnitCode),
+iSubQuantity int not null,
+UNIQUE (cSuperItemUnitCode,cSubItemUnitCode)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Item`
+(
+cItemCode char(9)not null
+PRIMARY KEY,
+vName varchar(50) unique not null,
+tDescription text,
+cType char(15) not null,
+cItemCategoryCode char(9) not null
+REFERENCES ItemCategory(cItemCategoryCode),
+cItemLocationCode char(9)
+REFERENCES ItemLocation(cItemLocationCode),
+mPrice decimal(50,2) not null,
+iQuantity int not null,
+cItemUnitCode char(9)
+REFERENCES ItemUnit(cItemUnitCode),
+mTax decimal(50,2) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ItemHistory`
+(
+cItemHistoryCode char(9)not null
+PRIMARY KEY,
+cItemCode char(9)
+REFERENCES Item(cItemCode),
+mUnitPrice DECIMAL(50,2),
+cStockInCode char(9),
+cStockOutCode char(9),
+iQuantity int not null,
+iItemBalance int not null
+)
+; 
+
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Employee`
+(
+cEmployeeID char(9)not null
+PRIMARY KEY,
+vFirstName varchar(20) not null,
+vMiddleName varchar(20) not null,
+vLastName varchar(20) not null,
+cTitle char(5),
+cStatus char(8),
+vAddress varchar(80),
+cCity char(15),
+cState char(15),
+cCountryCode Char(3)
+REFERENCES Country(cCountryCode),
+cZip char(8),
+cSex char(1) not null,
+dDateofBirth Datetime not null,
+cPhone char(15),
+cDepartmentCode char(9)not null
+REFERENCES Department(cDepartmentCode),
+cDesignationCode char(9)not null
+REFERENCES Designation(cDesignationCode),
+cBankCode char(9)
+REFERENCES Bank(cBankCode),
+vAccountNumber varchar(40),
+mAccountBalance decimal(50,2) not null,
+dDateRecorded Datetime not null,
+dAppointmentDate Datetime not null,
+dResignationDate Datetime,
+cCurrentOvertimeStatus char(9),
+cCurrentSalaryStatus char(9)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Account`
+(
+cAccountCode char(9) not null
+PRIMARY KEY,
+vAccountName varchar(30) UNIQUE not null,
+cBankCode char(9)
+REFERENCES Bank(cBankCode),
+vAccountNumber varchar(40),
+vAccountUnit char(9) not null,
+mAmount decimal(50,2) not null,
+cStatus char(8) not null,
+tDescription text not null,
+cValue char(9) not null,
+cCategory char(25) not null,
+cOrderCode char(9) not null,
+cTag char(3) not null,
+cTradingType char(8) not null,
+cActivity char(18) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Customer`
+(
+cCustomerID char(9)not null
+PRIMARY KEY ,
+vName varchar(40) unique not null,
+vAddress varchar(80),
+cCity char(15),
+cState char(15),
+cCountryCode Char(3)
+REFERENCES Country(cCountryCode),
+cZip char(8),
+cPhone char(15),
+cRegistrationNo char(10),
+mAccountBalance decimal(50,2)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Vendor`
+(
+cVendorID char(9)not null
+PRIMARY KEY,
+vName varchar(40) unique not null,
+vAddress varchar(80),
+cCity char(10),
+cState char(10),
+cCountryCode Char(3)
+REFERENCES Country(cCountryCode),
+cZip char(5),
+cPhone char(15),
+cRegistrationNo char(10),
+mAccountBalance decimal(50,2)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Login`
+(
+cLoginCode char(9)not null
+PRIMARY KEY,
+cEmployeeID char(9)not null
+REFERENCES Employee(cEmployeeID),
+vUsername varchar(10) UNIQUE not null,
+vPassword varchar(10) not null,
+cProcess char(12) not null,
+dDateCreated datetime not null,
+dDateBlocked datetime,
+cStatus char(8) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`LoginRecord`
+(
+cLoginRecordCode char(9)not null
+PRIMARY KEY,
+cLoginCode char(9)not null
+REFERENCES Login(cLoginCode),
+dLogin datetime not null,
+dLogout datetime,
+vComputerName varchar(50)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`TransactionType`
+(
+cTransactionTypeCode char(9)not null
+PRIMARY KEY ,
+vTransactionType varchar(50) unique not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`CreditOrder`
+(
+cCreditOrderCode char(9)not null
+PRIMARY KEY ,
+cMerchantID char(9),
+cAccountCode char(9)
+REFERENCES Account(cAccountCode),
+cCreditCode char(9),
+dCreditPostDate Datetime,
+cOrderbyID char(9)
+REFERENCES Login(cLoginCode),
+dOrderDate Datetime,
+cConsentID char(9)
+REFERENCES Login(cLoginCode),
+dConsentDate Datetime,
+vCreditingNumber varchar(50),
+dCreditDate Datetime,
+cTransactionTypeCode char(9)
+REFERENCES TransactionType(cTransactionTypeCode),
+cCostOrderCode char(9),
+mTotalAmount decimal(50,2) not null,
+mToBalance decimal(50,2) not null,
+cStatus char(8) not null,
+cReferalDepartmentCode char(9)
+REFERENCES Department(cDepartmentCode),
+cReferalState char(8),
+cActivity char(18),
+cTransactionType char(3),
+cRefID char(9)
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`CreditOrderSummary`
+(
+cCreditOrderCode char(9)not null
+REFERENCES CreditOrder(cCreditOrderCode),
+cItemCode char(9)
+REFERENCES Item(cItemCode),
+tDescription text,
+mAmount decimal(50,2) not null,
+iSerial int not null,
+cTag char(3) not null,
+iQtyConsumed int not null,
+mAmountItemIn decimal(50,2) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`DebitOrder`
+(
+cDebitOrderCode char(9)not null
+PRIMARY KEY,
+cMerchantID char(9)not null,
+cAccountCode char(9)
+REFERENCES Account(cAccountCode),
+cDebitCode char(9),
+dDebitPostDate Datetime,
+cOrderbyID char(9)
+REFERENCES Login(cLoginCode),
+dOrderDate Datetime,
+cConsentID char(9)
+REFERENCES Login(cLoginCode),
+dConsentDate Datetime,
+vDebitingNumber varchar(50),
+dDebitDate Datetime,
+cTransactionTypeCode char(9)
+REFERENCES TransactionType(cTransactionTypeCode),
+cCostOrderCode char(9),
+mTotalAmount decimal(50,2) not null,
+mToBalance decimal(50,2) not null,
+cStatus char(8) not null,
+cReferalDepartmentCode char(9)
+REFERENCES Department(cDepartmentCode),
+cReferalState char(8),
+cActivity char(18),
+cTransactionType char(3),
+cRefID char(9)
+)
+;CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`DebitOrderSummary`
+(
+cDebitOrderCode char(9)
+REFERENCES DebitOrder(cDebitOrderCode),
+cItemCode char(9)
+REFERENCES Item(cItemCode),
+tDescription text,
+mAmount decimal(50,2) not null,
+iSerial int,
+cTag char(3) not null,
+iQtyConsumed int not null,
+mAmountItemIn decimal(50,2) not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Pay`
+(
+cPayCode char(9)not null
+PRIMARY KEY,
+cAccountCode char(9)
+REFERENCES Account(cAccountCode),
+cCreditCode char(9),
+cDebitCode char(9),
+mAmount decimal(50,2) not null,
+mAccountBalance decimal(50,2) not null
+)
+; 
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`BackupRecord`
+(
+cBackupRecordCode char(9)not null
+PRIMARY KEY,
+cBackupByID char(9) not null
+REFERENCES Login(cLoginCode),
+cBackupType varchar(40) not null,
+dBackupTime datetime not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Groups`
+(
+cGroupCode char(9)not null
+PRIMARY KEY,
+vName varchar(50) unique not null
+)
+;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`MerchantGroup`
+(
+cGroupCode char(9),
+cMerchantID char(9) not null,
+UNIQUE (cGroupCode,cMerchantID)
+)
+;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCountryCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCountryCode`(OUT CountryCode char(3))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cCountryCode) into COUNTER FROM Country;
+	SET COUNTER=COUNTER+1;
+	SET CountryCode=CAST(COUNTER AS CHAR(3));
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET CountryCode=CONCAT('00',CAST(COUNTER AS CHAR(3)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET CountryCode=CONCAT('0',CAST(COUNTER AS CHAR(3)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET CountryCode=CAST(COUNTER AS CHAR(3));
+	END CASE;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCountryCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCountryCodeForName`(IN CountryName Varchar(50),OUT CountryCode Char(3) )
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Country WHERE vCountryName=CountryName)
+	THEN
+		SELECT cCountryCode INTO CountryCode FROM Country WHERE vCountryName=CountryName;
+	
+	ELSE
+		SELECT 'Specified country not be found';
+	END IF;
+
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCurrencyCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCurrencyCode`(OUT CurrencyCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cCurrencyCode) into COUNTER FROM Currency;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET CurrencyCode=CONCAT('CY000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET CurrencyCode=CONCAT('CY00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET CurrencyCode=CONCAT('CY0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET CurrencyCode=CONCAT('CY000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET CurrencyCode=CONCAT('CY00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET CurrencyCode=CONCAT('CY0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET CurrencyCode=CONCAT('CY',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDesignationCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDesignationCode`(OUT DesignationCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cDesignationCode) into COUNTER FROM Designation;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET DesignationCode=CONCAT('DG000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET DesignationCode=CONCAT('DG00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET DesignationCode=CONCAT('DG0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET DesignationCode=CONCAT('DG000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET DesignationCode=CONCAT('DG00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET DesignationCode=CONCAT('DG0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET DesignationCode=CONCAT('DG',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDesignationCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDesignationCodeForName`(IN DesignationName Varchar(50),OUT DesignationCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Designation WHERE vDesignationName=DesignationName)
+	THEN
+		SELECT cDesignationCode INTO DesignationCode FROM Designation WHERE vDesignationName=DesignationName;
+	
+	ELSE
+		SELECT 'Specified Designation not be found';
+	END IF;
+
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDepartmentCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDepartmentCode`(OUT DepartmentCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cDepartmentCode) into COUNTER FROM Department;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET DepartmentCode=CONCAT('DP000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET DepartmentCode=CONCAT('DP00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET DepartmentCode=CONCAT('DP0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET DepartmentCode=CONCAT('DP000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET DepartmentCode=CONCAT('DP00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET DepartmentCode=CONCAT('DP0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET DepartmentCode=CONCAT('DP',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDepartmentCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDepartmentCodeForName`(IN DepartmentName Varchar(50),OUT DepartmentCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Department WHERE vDepartmentName=DepartmentName)
+	THEN
+		SELECT cDepartmentCode INTO DepartmentCode FROM Department WHERE vDepartmentName=DepartmentName;	
+	ELSE
+		SELECT 'Specified Department not be found';
+	END IF;
+
+    END$$
+
+DELIMITER ;
+/*--------------------------------------------------------------------------*/
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenBankCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenBankCode`(OUT BankCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cBankCode) into COUNTER FROM Bank;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET BankCode=CONCAT('BK000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET BankCode=CONCAT('BK00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET BankCode=CONCAT('BK0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET BankCode=CONCAT('BK000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET BankCode=CONCAT('BK00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET BankCode=CONCAT('BK0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET BankCode=CONCAT('BK',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenBankCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenBankCodeForName`(IN BankName Varchar(50),OUT BankCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Bank WHERE vName=BankName)
+	THEN
+		SELECT cBankCode INTO BankCode FROM Bank WHERE vName=BankName;	
+	ELSE
+		SELECT 'Specified Bank not be found';
+	END IF;
+
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenEmployeeID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenEmployeeID`(OUT EmployeeID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cEmployeeID) into COUNTER FROM Employee;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET EmployeeID=CONCAT('EM000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET EmployeeID=CONCAT('EM00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET EmployeeID=CONCAT('EM0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET EmployeeID=CONCAT('EM000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET EmployeeID=CONCAT('EM00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET EmployeeID=CONCAT('EM0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET EmployeeID=CONCAT('EM',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenEmployeeIDForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenEmployeeIDForName`(IN EmployeeFirstName Varchar(20),
+IN EmployeeMiddleName Varchar(20),IN EmployeeLastName Varchar(20),OUT EmployeeID Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Employee WHERE vFirstName=EmployeeFirstName and vLastName=EmployeeLastName 
+	and vMiddleName=EmployeeMiddleName)
+	THEN
+		SELECT cEmployeeID INTO EmployeeID FROM Employee WHERE vFirstName=EmployeeFirstName 
+		and vLastName=EmployeeLastName and vMiddleName=EmployeeMiddleName;	
+	ELSE
+		SELECT 'Specified Employee not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenLoginCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenLoginCode`(OUT LoginCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cLoginCode) into COUNTER FROM Login;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET LoginCode=CONCAT('LG000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET LoginCode=CONCAT('LG00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET LoginCode=CONCAT('LG0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET LoginCode=CONCAT('LG000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET LoginCode=CONCAT('LG00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET LoginCode=CONCAT('LG0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET LoginCode=CONCAT('LG',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenLoginRecordCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenLoginRecordCode`(OUT LoginRecordCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cLoginRecordCode) into COUNTER FROM LoginRecord;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET LoginRecordCode=CONCAT('LR000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET LoginRecordCode=CONCAT('LR00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET LoginRecordCode=CONCAT('LR0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET LoginRecordCode=CONCAT('LR000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET LoginRecordCode=CONCAT('LR00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET LoginRecordCode=CONCAT('LR0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET LoginRecordCode=CONCAT('LR',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCustomerID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCustomerID`(OUT CustomerID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cCustomerID) into COUNTER FROM Customer;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET CustomerID=CONCAT('CU000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET CustomerID=CONCAT('CU00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET CustomerID=CONCAT('CU0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET CustomerID=CONCAT('CU000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET CustomerID=CONCAT('CU00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET CustomerID=CONCAT('CU0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET CustomerID=CONCAT('CU',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCustomerIDForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCustomerIDForName`(IN CustomerName Varchar(20),OUT CustomerID Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Customer WHERE vCustomerName=CustomerName)
+	THEN
+		SELECT cCustomerID INTO CustomerID FROM Customer WHERE vCustomerName=CustomerName;	
+	ELSE
+		SELECT 'Specified Customer not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenAccountCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenAccountCode`(OUT AccountCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cAccountCode) into COUNTER FROM Account;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET AccountCode=CONCAT('AC000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET AccountCode=CONCAT('AC00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET AccountCode=CONCAT('AC0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET AccountCode=CONCAT('AC000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET AccountCode=CONCAT('AC00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET AccountCode=CONCAT('AC0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET AccountCode=CONCAT('AC',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenAccountCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenAccountCodeForName`(IN AccountName Varchar(50),OUT AccountCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Account WHERE vAccountName=AccountName)
+	THEN
+		SELECT cAccountCode INTO AccountCode FROM Account WHERE vAccountName=AccountName;	
+	ELSE
+		SELECT 'Specified Account not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenVendorID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenVendorID`(OUT VendorID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cVendorID) into COUNTER FROM Vendor;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET VendorID=CONCAT('VD000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET VendorID=CONCAT('VD00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET VendorID=CONCAT('VD0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET VendorID=CONCAT('VD000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET VendorID=CONCAT('VD00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET VendorID=CONCAT('VD0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET VendorID=CONCAT('VD',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenVendorIDForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenVendorIDForName`(IN VendorName Varchar(50),OUT VendorCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Vendor WHERE vVendorName=VendorName)
+	THEN
+		SELECT cVendorCode INTO VendorCode FROM Vendor WHERE vVendorName=VendorName;	
+	ELSE
+		SELECT 'Specified Vendor not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenTransactionTypeCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenTransactionTypeCode`(OUT TransactionTypeCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cTransactionTypeCode) into COUNTER FROM TransactionType;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET TransactionTypeCode=CONCAT('TT000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET TransactionTypeCode=CONCAT('TT00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET TransactionTypeCode=CONCAT('TT0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET TransactionTypeCode=CONCAT('TT000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET TransactionTypeCode=CONCAT('TT00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET TransactionTypeCode=CONCAT('TT0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET TransactionTypeCode=CONCAT('TT',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenTransactionTypeCodeForType`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenTransactionTypeCodeForType`(IN TransactionType Varchar(50),OUT TransactionTypeCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM TransactionType WHERE vTransactionType=TransactionType)
+	THEN
+		SELECT cTransactionTypeCode INTO TransactionTypeCode FROM TransactionType WHERE vTransactionType=TransactionType;	
+	ELSE
+		SELECT 'Specified Transaction Type not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCreditCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCreditCode`(OUT CreditCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cCreditCode) into COUNTER FROM CreditOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET CreditCode=CONCAT('CR000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET CreditCode=CONCAT('CR00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET CreditCode=CONCAT('CR0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET CreditCode=CONCAT('CR000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET CreditCode=CONCAT('CR00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET CreditCode=CONCAT('CR0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET CreditCode=CONCAT('CR',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCreditRefID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCreditRefID`(OUT RefID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cRefID) into COUNTER FROM CreditOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET RefID =CONCAT('CF000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET RefID =CONCAT('CF00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET RefID =CONCAT('CF0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET RefID =CONCAT('CF000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET RefID =CONCAT('CF00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET RefID =CONCAT('CF0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET RefID=CONCAT('CF',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDebitRefID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDebitRefID`(OUT RefID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cRefID) into COUNTER FROM DebitOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET RefID =CONCAT('DF000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET RefID =CONCAT('DF00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET RefID =CONCAT('DF0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET RefID =CONCAT('DF000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET RefID =CONCAT('DF00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET RefID =CONCAT('DF0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET RefID=CONCAT('DF',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenCreditOrderCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenCreditOrderCode`(OUT CreditOrderCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cCreditOrderCode) into COUNTER FROM CreditOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET CreditOrderCode=CONCAT('CO000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET CreditOrderCode=CONCAT('CO00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET CreditOrderCode=CONCAT('CO0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET CreditOrderCode=CONCAT('CO000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET CreditOrderCode=CONCAT('CO00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET CreditOrderCode=CONCAT('CO0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET CreditOrderCode=CONCAT('CO',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenPayCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenPayCode`(OUT PayCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cPayCode) into COUNTER FROM Pay;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET PayCode=CONCAT('PY000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET PayCode=CONCAT('PY00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET PayCode=CONCAT('PY0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET PayCode=CONCAT('PY000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET PayCode=CONCAT('PY00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET PayCode=CONCAT('PY0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET PayCode=CONCAT('PY',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDebitCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDebitCode`(OUT DebitCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cDebitCode) into COUNTER FROM DebitOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET DebitCode=CONCAT('DB000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET DebitCode=CONCAT('DB00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET DebitCode=CONCAT('DB0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET DebitCode=CONCAT('DB000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET DebitCode=CONCAT('DB00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET DebitCode=CONCAT('DB0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET DebitCode=CONCAT('DB',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenDebitOrderCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenDebitOrderCode`(OUT DebitOrderCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cDebitOrderCode) into COUNTER FROM DebitOrder;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET DebitOrderCode=CONCAT('DO000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET DebitOrderCode=CONCAT('DO00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET DebitOrderCode=CONCAT('DO0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET DebitOrderCode=CONCAT('DO000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET DebitOrderCode=CONCAT('DO00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET DebitOrderCode=CONCAT('DO0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET DebitOrderCode=CONCAT('DO',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+/*--------------------------------------------------------------------------*/
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemCode`(OUT ItemCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemCode) into COUNTER FROM Item;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemCode=CONCAT('IT000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemCode=CONCAT('IT00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemCode=CONCAT('IT0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemCode=CONCAT('IT000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemCode=CONCAT('IT00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemCode=CONCAT('IT0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemCode=CONCAT('IT',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+/*--------------------------------------------------------------------------*/
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemCodeForName`(IN ItemName Varchar(50),OUT ItemCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Item WHERE vName=ItemName)
+	THEN
+		SELECT cItemCode INTO ItemCode FROM Item WHERE vName=ItemName;	
+	ELSE
+		SELECT 'Specified Item not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+/*--------------------------------------------------------------------------*/
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemCategoryCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemCategoryCode`(OUT ItemCategoryCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemCategoryCode) into COUNTER FROM ItemCategory;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemCategoryCode=CONCAT('IC000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemCategoryCode=CONCAT('IC00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemCategoryCode=CONCAT('IC0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemCategoryCode=CONCAT('IC000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemCategoryCode=CONCAT('IC00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemCategoryCode=CONCAT('IC0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemCategoryCode=CONCAT('IC',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemCategoryCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemCategoryCodeForName`(IN CategoryName Varchar(50),OUT CategoryCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM ItemCategory WHERE vCategoryName=CategoryName)
+	THEN
+		SELECT cItemCategoryCode INTO CategoryCode FROM ItemCategory WHERE vCategoryName=CategoryName;	
+	ELSE
+		SELECT 'Specified Item category not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemHistoryCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemHistoryCode`(OUT ItemHistoryCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemHistoryCode) into COUNTER FROM ItemHistory;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemHistoryCode=CONCAT('IH000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemHistoryCode=CONCAT('IH00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemHistoryCode=CONCAT('IH0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemHistoryCode=CONCAT('IH000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemHistoryCode=CONCAT('IH00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemHistoryCode=CONCAT('IH0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemHistoryCode=CONCAT('IH',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitCode`(OUT ItemUnitCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemUnitCode) into COUNTER FROM ItemUnit;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemUnitCode=CONCAT('IU000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemUnitCode=CONCAT('IU00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemUnitCode=CONCAT('IU0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemUnitCode=CONCAT('IU000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemUnitCode=CONCAT('IU00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemUnitCode=CONCAT('IU0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemUnitCode=CONCAT('IU',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitCodeForName`(IN ItemUnitName Varchar(50),OUT ItemUnitCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM ItemUnit WHERE vItemUnitName=ItemUnitName)
+	THEN
+		SELECT cItemUnitCode INTO ItemUnitCode FROM ItemUnit WHERE vItemUnitName=ItemUnitName;	
+	ELSE
+		SELECT 'Specified Item Item Unit not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitConversionCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemUnitConversionCode`(OUT ItemUnitConversionCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemUnitConversionCode) into COUNTER FROM ItemUnitConversion;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemUnitConversionCode=CONCAT('IV000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemUnitConversionCode=CONCAT('IV00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemUnitConversionCode=CONCAT('IV0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemUnitConversionCode=CONCAT('IV000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemUnitConversionCode=CONCAT('IV00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemUnitConversionCode=CONCAT('IV0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemUnitConversionCode=CONCAT('IV',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemLocationCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemLocationCode`(OUT ItemLocationCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cItemLocationCode) into COUNTER FROM ItemLocation;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ItemLocationCode=CONCAT('IL000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ItemLocationCode=CONCAT('IL00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ItemLocationCode=CONCAT('IL0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ItemLocationCode=CONCAT('IL000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ItemLocationCode=CONCAT('IL00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ItemLocationCode=CONCAT('IL0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ItemLocationCode=CONCAT('IL',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenItemLocationCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenItemLocationCodeForName`(IN LocationName Varchar(50),OUT ItemLocationCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM ItemLocation WHERE vLocationName=LocationName)
+	THEN
+		SELECT cItemLocationCode INTO ItemLocationCode FROM ItemLocation WHERE vLocationName=LocationName;	
+	ELSE
+		SELECT 'Specified Item Item Location Name not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenBackupRecordCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenBackupRecordCode`(OUT BackupRecordCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cBackupRecordCode) into COUNTER FROM BackupRecord;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET BackupRecordCode=CONCAT('BR000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN	
+		SET BackupRecordCode=CONCAT('BR00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET BackupRecordCode=CONCAT('BR0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET BackupRecordCode=CONCAT('BR000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET BackupRecordCode=CONCAT('BR00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET BackupRecordCode=CONCAT('BR0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET BackupRecordCode=CONCAT('BR',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenGroupCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenGroupCode`(OUT GroupCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cGroupCode) into COUNTER FROM Groups;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET GroupCode=CONCAT('GP000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET GroupCode=CONCAT('GP00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET GroupCode=CONCAT('GP0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET GroupCode=CONCAT('GP000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET GroupCode=CONCAT('GP00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET GroupCode=CONCAT('GP0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET GroupCode=CONCAT('GP',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ; 
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenGroupCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenGroupCodeForName`(IN GroupName Varchar(50),OUT GroupCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Groups WHERE vName=GroupName)
+	THEN
+		SELECT cGroupCode INTO GroupCode FROM Groups WHERE vName=GroupName;	
+	ELSE
+		SELECT 'Specified Group Name not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenMerchantIDForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenMerchantIDForName`(IN MerchantName Varchar(50),OUT MerchantID Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM vwMerchant WHERE vName=MerchantName)
+	THEN
+		SELECT cMerchantID INTO MerchantID FROM vwMerchant WHERE vName=MerchantName;	
+	ELSE
+		SELECT 'Specified Merchant Name not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditRefID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditRefID`()
+BEGIN
+	call prnGenCreditRefID(@S);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitRefID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitRefID`()
+BEGIN
+	call prnGenDebitRefID(@S);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditOrderCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditOrderCode`()
+BEGIN
+	call prnGenCreditOrderCode(@s);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintCreditCode`()
+BEGIN
+	call prnGenCreditCode(@s);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitOrderCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitOrderCode`()
+BEGIN
+	call prnGenDebitOrderCode(@s);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintDebitCode`()
+BEGIN
+	call prnGenDebitCode(@s);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnAddMoney`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnAddMoney`(IN FirstValue decimal(50,2),IN SecondValue decimal(50,2))
+BEGIN
+	DECLARE SumValue Decimal(50,2);
+	SET @SumValue=FirstValue+SecondValue;
+	SELECT @SumValue AS 'mSumValue';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnWeighMoney`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnWeighMoney`(IN FirstValue decimal(50,2),IN SecondValue decimal(50,2))
+BEGIN
+	IF(FirstValue >= SecondValue)
+	THEN
+	SELECT '1 >= 2' AS 'weightValue';
+	ELSE
+	SELECT '1 < 2' AS 'weightValue';
+	END IF;
+
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnMultMoney`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnMultMoney`(IN FirstValue decimal(50,2),IN SecondValue decimal(50,2))
+BEGIN
+	DECLARE MultValue Decimal(50,2);
+	SET @MultValue=FirstValue*SecondValue;
+	SELECT @MultValue AS 'mMultValue';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnSubtractMoney`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnSubtractMoney`(IN LargeValue decimal(50,2),IN LittleValue decimal(50,2))
+BEGIN
+	DECLARE SumValue Decimal(50,2);
+	SET @SumValue=LargeValue-LittleValue;
+	SELECT @SumValue AS 'mSumValue';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCountry`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCountry`(IN CountryName Varchar(20))
+BEGIN
+	call prnGenCountryCode(@CountryCode);
+	INSERT INTO Country
+	VALUES(@CountryCode,CountryName);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDepartment`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDepartment`(IN DepartmentName Varchar(50))
+BEGIN
+	call prnGenDepartmentCode(@DepartmentCode);
+	INSERT INTO Department
+	VALUES(@DepartmentCode,DepartmentName);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsItemUnit`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsItemUnit`(IN ItemUnitName Varchar(50))
+BEGIN
+	call prnGenItemUnitCode(@ItemUnitCode);
+	INSERT INTO ItemUnit
+	VALUES(@ItemUnitCode,ItemUnitName);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsAccount`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsAccount`(
+IN AccountName Varchar(30),
+IN BankName Varchar(50),
+IN AccountNumber Varchar(40),
+IN AccountUnit char(9),
+IN AccountDescription text,
+IN AccountValue char(9),
+IN AccountCategory char(25),
+IN AccountTradingType char(8),
+IN AccountActivity char(18))
+BEGIN
+	CALL prnGenAccountCode(@AccountCode);
+	CALL prnGenDebitOrderCode(@DebitOrderCode);
+	CALL prnGenBankCodeForName(BankName,@BankCode);
+
+	INSERT INTO Account
+	VALUES(@AccountCode,AccountName,@BankCode,AccountNumber,AccountUnit,0,'Frozen',AccountDescription,AccountValue,AccountCategory,'db','0',AccountTradingType,AccountActivity);
+
+	
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsGroup`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsGroup`(IN GroupName Varchar(50))
+BEGIN
+	call prnGenGroupCode(@GroupCode);
+	INSERT INTO Groups
+	VALUES(@GroupCode,GroupName);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsMerchantGroup`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsMerchantGroup`(IN GroupName Varchar(50),IN MerchantName Varchar(50))
+BEGIN
+	CALL prnGenGroupCodeForName(GroupName,@GroupCode);
+	CALL prnGenMerchantIDForName(MerchantName,@MerchantID);
+
+	INSERT INTO MerchantGroup
+	VALUES(@GroupCode, @MerchantID);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCurrency`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCurrency`(IN CurrencyName Varchar(50))
+BEGIN
+	CALL prnGenCurrencyCode(@CurrencyCode);
+	INSERT INTO Currency
+	VALUES(@CurrencyCode,CurrencyName);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDesignation`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDesignation`(IN DesignationName Varchar(50))
+BEGIN
+	CALL prnGenDesignationCode(@DesignationCode);
+	INSERT INTO Designation
+	VALUES(@DesignationCode,DesignationName,0.0);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsTransactionType`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsTransactionType`(IN TransactionTypeName Varchar(50))
+BEGIN
+	CALL prnGenTransactionTypeCode(@TransactionTypeCode);
+	INSERT INTO TransactionType
+	VALUES(@TransactionTypeCode,TransactionTypeName);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsBank`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsBank`(IN BankName Varchar(40),IN Address Varchar(80),IN City char(10),
+IN State char(10),IN CountryName Varchar(40),IN Zip char(5),IN Phone char(15))
+BEGIN
+	CALL prnGenBankCode(@BankCode);
+	CALL prnGenCountryCodeForName(CountryName,@CountryCode);
+	INSERT INTO Bank
+	VALUES(@BankCode,BankName,Address,City,State,@CountryCode,Zip,Phone);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsItem`;
+
+DELIMITER $$
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsItem`(
+vName Varchar(50),
+tDescription text,
+cType char(15),
+vItemCategoryName varchar(50),
+vItemLocationName varchar(50),
+vPrice Varchar(50),
+vItemUnit varchar(50),
+vTax varchar(50)
+)
+BEGIN
+	DECLARE ConvertedTax DECIMAL(50,2);
+	CALL prnGenItemCode(@ItemCode);
+	CALL prnGenItemUnitCodeForName(vItemUnit,@ItemUnitCode);
+	CALL prnGenItemCategoryCodeForName(vItemCategoryName,@ItemCategoryCode);
+	CALL prnGenItemLocationCodeForName(vItemLocationName,@ItemLocationCode);
+	SET @ConvertedPrice=CAST(vPrice AS DECIMAL(50,2));
+	SET @ConvertedTax=CAST(vTax AS DECIMAL(50,2));
+	INSERT INTO Item
+	VALUES(@ItemCode,vName,tDescription,cType,@ItemCategoryCode,@ItemLocationCode,@ConvertedPrice,0,@ItemUnitCode,@ConvertedTax);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsItemCategory`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsItemCategory`(IN ItemCategoryName Varchar(50))
+BEGIN
+	CALL prnGenItemCategoryCode(@ItemCategoryCode);
+	INSERT INTO ItemCategory
+	VALUES(@ItemCategoryCode,ItemCategoryName);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsItemLocation`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsItemLocation`(IN ItemLocationName Varchar(50))
+BEGIN
+	CALL prnGenItemLocationCode(@ItemLocationCode);
+	INSERT INTO ItemLocation
+	VALUES(@ItemLocationCode,ItemLocationName);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsEmployee`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsEmployee`(
+vFirstName Varchar(20),
+vMiddleName Varchar(20),
+vLastName Varchar(20),
+cTitle Char(5),
+cStatus Char(8),
+vAddress Varchar(80),
+cCity Char(15),
+cState Char(15),
+vCountryName Varchar(40),
+cZip Char(8),
+cSex Char(1),
+dDateofBirth Datetime,
+cPhone Char(15),
+vDepartmentName Varchar(50),
+vDesignationName Varchar(50),
+vBankName Varchar(50),
+vAccountNumber varchar(40),
+dAppointmentDate Datetime
+)
+BEGIN
+	CALL prnGenEmployeeID(@EmployeeID);
+	CALL prnGenCountryCodeForName(vCountryName,@CountryCode);
+	CALL prnGenDepartmentCodeForName(vDepartmentName,@DepartmentCode);
+	CALL prnGenDesignationCodeForName(vDesignationName,@DesignationCode);
+	CALL prnGenBankCodeForName(vBankName,@BankCode);	
+	SET @DateRecorded=NOW();
+	INSERT INTO Employee
+	VALUES(@EmployeeID,vFirstName,vMiddleName,vLastName,cTitle,cStatus,vAddress,cCity,cState,@CountryCode,cZip,
+		cSex,dDateofBirth,cPhone,@DepartmentCode,@DesignationCode,@BankCode,vAccountNumber,0.00,@DateRecorded,
+		dAppointmentDate,null,null,null);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCustomer`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCustomer`(
+vName Varchar(40),
+vAddress Varchar(80),
+cCity Char(15),
+cState Char(15),
+vCountryName Varchar(40),
+cZip Char(8),
+cPhone Char(15),
+vRegistrationNumber varchar(10))
+BEGIN
+	CALL prnGenCustomerID(@CustomerID);
+	CALL prnGenCountryCodeForName(vCountryName,@CountryCode);
+	INSERT INTO Customer
+	VALUES(@CustomerID,vName,vAddress,cCity,cState,@CountryCode,cZip,
+		cPhone,vRegistrationNumber,0.0);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsVendor`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsVendor`(
+vName Varchar(40),
+vAddress Varchar(80),
+cCity Char(15),
+cState Char(15),
+vCountryName Varchar(40),
+cZip Char(8),
+cPhone Char(15),
+vRegistrationNumber varchar(10))
+BEGIN
+	CALL prnGenVendorID(@VendorID);
+	CALL prnGenCountryCodeForName(vCountryName,@CountryCode);
+	INSERT INTO Vendor
+	VALUES(@VendorID,vName,vAddress,cCity,cState,@CountryCode,cZip,
+		cPhone,vRegistrationNumber,0.0);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsLogin`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsLogin`(
+cEmployeeID char(9),
+vUsername varchar(10),
+vPassword varchar(10),
+cProcess char(12)
+)
+BEGIN
+	CALL prnGenLoginCode(@LoginCode);
+	SET @DateCreated=NOW();
+	INSERT INTO Login
+	VALUES(@LoginCode,cEmployeeID,vUsername,vPassword,cProcess,@DateCreated,null,'Blocked');
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderOnOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderOnOrder`(
+cMerchantID char(9),
+cAccountCode char(9),
+cOrderbyID char(9),
+vCreditingNumber varchar(50),
+dCreditDate datetime,
+cTransactionTypeCode char(9),
+cCostOrderCode char(9),
+vTotalAmountV VARCHAR(50),
+cReferalDepartmentCode char(9),
+cActivity char(18),
+cTransactionType char(3),
+cRefID char(9),
+vNetToBalanceV varchar(50)
+)
+BEGIN
+	CALL prnGenCreditOrderCode(@CreditOrderCode);
+	SET @TotalAmount=CAST(vTotalAmountV AS Decimal(50,2));
+	SET @NetToBalance=CAST(vNetToBalanceV AS Decimal(50,2));
+	SET @OrderDate=NOW();
+
+	INSERT INTO CreditOrder
+	VALUES(@CreditOrderCode,cMerchantID,cAccountCode,null,null,cOrderbyID,@OrderDate,null,null,vCreditingNumber,
+		dCreditDate,cTransactionTypeCode,cCostOrderCode,@TotalAmount,@NetToBalance,'pending',
+		cReferalDepartmentCode,'pending',cActivity,cTransactionType,cRefID);
+	
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderSummaryOnOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderSummaryOnOrder`(
+cCreditOrderCode char(9),
+vItemName varchar(50),
+tDescription text,
+vAmountV varchar(50),
+iSerial int
+)
+
+BEGIN
+	CALL prnGenItemCodeForName(vItemName,@ItemCode);
+	SET @Amount=CAST(vAmountV AS Decimal(50,2));
+	INSERT INTO CreditOrderSummary
+	VALUES(@CreditOrderCode,@ItemCode,tDescription,@Amount,iSerial,'IN',0,@Amount);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderSummaryOnOrderOUT`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsCreditOrderSummaryOnOrderOUT`(
+cCreditOrderCode char(9),
+vItemName varchar(50),
+tDescription text,
+vAmountV varchar(50),
+iSerial int
+)
+
+BEGIN
+	CALL prnGenItemCodeForName(vItemName,@ItemCode);
+	SET @Amount=CAST(vAmountV AS Decimal(50,2));
+	INSERT INTO CreditOrderSummary
+	VALUES(@CreditOrderCode,@ItemCode,tDescription,@Amount,iSerial,'OUD',0,0);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderOnOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderOnOrder`(
+cMerchantID char(9),
+cAccountCode char(9),
+cOrderbyID char(9),
+vDebitingNumber varchar(50),
+dDebitDate datetime,
+cTransactionTypeCode char(9),
+cCostOrderCode char(9),
+vTotalAmountV Varchar(50),
+cReferalDepartmentCode char(9),
+cActivity char(18),
+cTransactionType char(3),
+cRefID char(9),
+vNewToBalanceV varchar(50)
+)
+BEGIN
+	CALL prnGenDebitOrderCode(@DebitOrderCode);
+	SET @TotalAmount=CAST(vTotalAmountV AS Decimal(50,2));
+	SET @NewToBalance=CAST(vNewToBalanceV AS Decimal(50,2));
+	SET @OrderDate=NOW();
+
+	INSERT INTO DebitOrder
+	VALUES(@DebitOrderCode,cMerchantID,cAccountCode,null,null,cOrderbyID,@OrderDate,null,null,vDebitingNumber,
+		dDebitDate,cTransactionTypeCode,cCostOrderCode,@TotalAmount,@NewToBalance,'pending',
+		cReferalDepartmentCode,'pending',cActivity,cTransactionType,cRefID);
+	
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderSummaryOnOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderSummaryOnOrder`(
+cDebitOrderCode char(9),
+vItemName varchar(50),
+tDescription text,
+vAmountV varchar(50),
+iSerial int
+)
+BEGIN
+	CALL prnGenItemCodeForName(vItemName,@ItemCode);
+	SET @Amount=CAST(vAmountV AS Decimal(50,2));
+	INSERT INTO DebitOrderSummary
+	VALUES(@DebitOrderCode,@ItemCode,tDescription,@Amount,iSerial,'IN',0,@Amount);
+END$$
+
+DELIMITER ;
+
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdItem`;
+
+DELIMITER $$
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdItem`(
+chItemCode Char(9),
+teDescription text,
+chItemLocationName char(9),
+vhPrice varchar(50),
+vhTax varchar(50)
+)
+BEGIN
+	CALL prnGenItemLocationCodeForName(chItemLocationName,@ItemLocationCode);
+	SET @Price=CAST(vhPrice AS Decimal(50,2));
+	SET @Tax=CAST(vhTax AS Decimal(50,2));
+	UPDATE Item
+	SET tDescription=teDescription,cItemLocationCode=@ItemLocationCode,mPrice=@Price,mTax=@Tax
+	WHERE cItemCode=chItemCode;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnDeleteMerchantGroup`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnDeleteMerchantGroup`(IN GroupName Varchar(50),IN MerchantID char(9))
+BEGIN
+	CALL prnGenGroupCodeForName(GroupName,@GroupCode);
+
+	DELETE FROM MerchantGroup
+	WHERE cGroupCode=@GroupCode and cMerchantID=MerchantID;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdEmployee`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdEmployee`(
+chEmployeeID Char(9),
+vhLastName Varchar(20),
+chTitle Char(5),
+chStatus Char(8),
+vhAddress Varchar(80),
+chState char(15),
+chCity char(15),
+chZip char(8),
+vhCountryName Varchar(40),
+chPhone Char(15),
+vhDepartmentName Varchar(50),
+vhDesignationName Varchar(50),
+vhBankName Varchar(50),
+vhAccountNumber varchar(40),
+dhResignationDate Datetime
+)
+BEGIN
+	CALL prnGenDepartmentCodeForName(vhDepartmentName,@DepartmentCode);
+	CALL prnGenDesignationCodeForName(vhDesignationName,@DesignationCode);
+	CALL prnGenBankCodeForName(vhBankName,@BankCode);
+	CALL prnGenCountryCodeForName(vhCountryName,@CountryCode);
+
+	IF(dhResignationDate='')
+	THEN	
+		UPDATE Employee
+		SET vLastName=vhLastName,cTitle=chTitle,cStatus=chStatus,vAddress=vhAddress,cState=chState
+		,cCity=chCity,cZip=chZip,cCountryCode=@CountryCode,cPhone=chPhone,cDepartmentCode=@DepartmentCode,
+		cDesignationCode=@DesignationCode,cBankCode=@BankCode,vAccountNumber=vhAccountNumber,dResignationDate=NULL
+		WHERE cEmployeeID=chEmployeeID;
+	ELSE
+		UPDATE Employee
+		SET vLastName=vhLastName,cTitle=chTitle,cStatus=chStatus,vAddress=vhAddress,cState=chState
+		,cCity=chCity,cZip=chZip,cCountryCode=@CountryCode,cPhone=chPhone,cDepartmentCode=@DepartmentCode,
+		cDesignationCode=@DesignationCode,cBankCode=@BankCode,vAccountNumber=vhAccountNumber,dResignationDate=dhResignationDate
+		WHERE cEmployeeID=chEmployeeID;
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnCreditAccount`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnCreditAccount`(IN chCreditCode char(9))
+BEGIN
+
+	DECLARE chAccountCode,chCreditCostOrderCode CHAR(9);
+	DECLARE dmCreditAmount Decimal(50,2);
+	DECLARE cur1 Cursor for SELECT cAccountCode,cCostOrderCode,mTotalAmount FROM CreditOrder WHERE cCreditCode=chCreditCode;
+
+OPEN cur1;
+
+	FETCH cur1 INTO chAccountCode,chCreditCostOrderCode,dmCreditAmount;
+
+	SELECT mAmount INTO @OldBalance from Account where Account.cAccountCode=chAccountCode;
+
+	SET @NewBalance = @OldBalance+dmCreditAmount;
+
+	CALL prnGenPayCode(@PayCode);
+
+	UPDATE Account
+	SET mAmount=@NewBalance
+	WHERE Account.cAccountCode=chAccountCode;
+
+	INSERT INTO Pay
+	VALUES(@PayCode,chAccountCode,chCreditCode,null,dmCreditAmount,@NewBalance);
+
+CLOSE cur1; 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnAddNote`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnAddNote`(IN chMerchantID char(9), IN txNote text)
+BEGIN
+
+	DECLARE ttNote TEXT;
+	
+	IF EXISTS (SELECT * FROM NOTE WHERE cMerchantID=chMerchantID)
+	THEN	
+
+	Select tNote into @ttNote from Note where cMerchantID=chMerchantID;
+
+	UPDATE NOTE
+	SET tNote=CONCAT(CONCAT(@ttNote,NOW()),CONCAT(' ',txNote))
+	WHERE cMerchantID=chMerchantID;
+	
+	ELSE
+
+	INSERT INTO NOTE
+	VALUES(chMerchantID,CONCAT(CONCAT(NOW(),' '),txNote));
+
+	END IF;
+ 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnDebitAccount`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnDebitAccount`(IN chDebitCode char(9))
+BEGIN
+
+	DECLARE chAccountCode,chDebitCostOrderCode CHAR(9);
+	DECLARE dmDebitAmount Decimal(50,2);
+	DECLARE cur1 Cursor for	SELECT cCostOrderCode,cAccountCode,mTotalAmount FROM DebitOrder WHERE cDebitCode=chDebitCode;
+OPEN cur1;
+	FETCH cur1 INTO chDebitCostOrderCode,chAccountCode,dmDebitAmount;
+
+	SELECT mAmount INTO @OldBalance from Account where Account.cAccountCode=chAccountCode;
+
+	SET @NewBalance = @OldBalance-dmDebitAmount;
+
+	CALL prnGenPayCode(@PayCode);
+
+	UPDATE Account
+	SET mAmount=@NewBalance
+	WHERE Account.cAccountCode=chAccountCode;
+
+	INSERT INTO Pay
+	VALUES(@PayCode,chAccountCode,null,chDebitCode,dmDebitAmount,@NewBalance);
+
+CLOSE cur1;	
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderOnConsent`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderOnConsent`(
+chCreditOrderCode char(9),
+chConsentID char(9)
+)
+BEGIN
+	SET @ConsentDate=NOW();
+	UPDATE CreditOrder
+	SET cConsentID=chConsentID,dConsentDate=@ConsentDate,cStatus='approved'
+	WHERE cRefID=chCreditOrderCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCustomer`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCustomer`(
+chCustomerID Char(9),
+vhAddress Varchar(80),
+chCity Char(15),
+chState Char(15),
+vhCountryName Varchar(40),
+chZip Char(8),
+chPhone Char(15),
+vhRegistrationNumber varchar(10)
+)
+BEGIN
+	CALL prnGenCountryCodeForName(vhCountryName,@CountryCode);
+	UPDATE Customer 
+	SET vAddress=vhAddress,cCity=chCity,cState=chState,cCountryCode=@CountryCode,cZip=chZip,cPhone=chPhone,
+	cRegistrationNo=vhRegistrationNumber
+	WHERE cCustomerID=chCustomerID;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdVendor`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdVendor`(
+chVendorID Char(9),
+vhAddress Varchar(80),
+chCity Char(15),
+chState Char(15),
+vhCountryName Varchar(40),
+chZip Char(8),
+chPhone Char(15),
+vhRegistrationNumber varchar(10)
+)
+BEGIN
+	CALL prnGenCountryCodeForName(vhCountryName,@CountryCode);
+	UPDATE Vendor 
+	SET vAddress=vhAddress,cCity=chCity,cState=chState,cCountryCode=@CountryCode,cZip=chZip,cPhone=chPhone,
+	cRegistrationNo=vhRegistrationNumber
+	WHERE cVendorID=chVendorID;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderOnConsent`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderOnConsent`(
+chDebitOrderCode char(9),
+chConsentID char(9)
+)
+BEGIN
+	SET @ConsentDate=NOW();
+	UPDATE DebitOrder
+	SET cConsentID=chConsentID,dConsentDate=@ConsentDate,cStatus='approved'
+	WHERE cRefID=chDebitOrderCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdPayableDebitOrderOnPost`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdPayableDebitOrderOnPost`(IN chDebitOrderCode char(9),IN chAccountCode char(9))
+BEGIN
+	CALL prnGenDebitCode(@DebitCode);
+
+	SET @DebitPostDate=NOW();
+
+	UPDATE DebitOrder
+	SET cDebitCode=@DebitCode,dDebitPostDate=@DebitPostDate,cStatus='posted'
+	WHERE cRefID=chDebitOrderCode AND cAccountCode=chAccountCode;
+
+	CALL prnDebitAccount(@DebitCode);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdPayableCreditOrderOnPost`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdPayableCreditOrderOnPost`(IN chCreditOrderCode char(9),IN chAccountCode char(9))
+BEGIN
+	CALL prnGenCreditCode(@CreditCode);
+
+	SET @CreditPostDate=NOW();
+
+	UPDATE CreditOrder
+	SET cCreditCode=@CreditCode,dCreditPostDate=@CreditPostDate,cStatus='posted'
+	WHERE cRefID=chCreditOrderCode AND cAccountCode=chAccountcode;
+
+	CALL prnCreditAccount(@CreditCode);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderOnPost`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderOnPost`(IN chRefID char(9))
+BEGIN
+	CALL prnGenDebitCode(@DebitCode);
+
+	SET @DebitPostDate=NOW();
+IF EXISTS(SELECT * FROM DEBITORDER WHERE CREFID=CHREFID)
+THEN
+	UPDATE DebitOrder
+	SET cDebitCode=@DebitCode,dDebitPostDate=@DebitPostDate,cStatus='posted'
+	WHERE cRefID=chRefID;
+	CALL prnDebitAccount(@DebitCode);
+END IF; END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderOnPost`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderOnPost`(IN chRefID char(9))
+BEGIN
+	CALL prnGenCreditCode(@CreditCode);
+
+	SET @CreditPostDate=NOW();
+
+IF EXISTS(SELECT * FROM CREDITORDER WHERE CREFID=CHREFID)
+THEN
+	UPDATE CreditOrder
+	SET cCreditCode=@CreditCode,dCreditPostDate=@CreditPostDate,cStatus='posted'
+	WHERE cRefID=chRefID;
+	CALL prnCreditAccount(@CreditCode);
+END IF; 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdLogin`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdLogin`(
+chLoginCode Char(9),
+vhUsername varchar(10),
+vhPassword varchar(10)
+)
+BEGIN
+	UPDATE Login
+	SET vUsername=vhUsername,vPassword=vhPassword
+	WHERE cLoginCode=chLoginCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnBlockLogin`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnBlockLogin`(
+chLoginCode Char(9)
+)
+BEGIN
+	UPDATE Login
+	SET cStatus='Blocked'
+	WHERE cLoginCode=chLoginCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnActivateLogin`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnActivateLogin`(
+chLoginCode Char(9)
+)
+BEGIN
+	UPDATE Login
+	SET cStatus='Active'
+	WHERE cLoginCode=chLoginCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnFreezeAccount`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnFreezeAccount`(
+chAccountCode Char(9)
+)
+BEGIN
+	UPDATE Account
+	SET cStatus='Frozen'
+	WHERE cAccountCode=chAccountCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnActivateAccount`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnActivateAccount`(
+chAccountCode Char(9)
+)
+BEGIN
+	UPDATE Account
+	SET cStatus='Active'
+	WHERE cAccountCode=chAccountCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnLogout`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnLogout`(
+chLoginCode Char(9)
+)
+BEGIN
+	SET @LogoutTime=NOW();
+
+	IF EXISTS(Select * from LoginRecord where cLoginCode=chLoginCode and dLogout is null)
+	THEN		
+		Select cLoginRecordCode into @LoginRecordCode from LoginRecord where cLoginCode=chLoginCode and dLogout is null;
+
+		UPDATE LoginRecord
+		SET dLogout=@LogoutTime
+		WHERE cLoginRecordCode=@LoginRecordCode;
+
+		SELECT 'Out' AS "cState";		
+	ELSE
+		SELECT 'Error' AS "cState"; 
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnConfirmLogout`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnConfirmLogout`(
+chLoginCode Char(9)
+)
+BEGIN
+	SET @LogoutTime=NOW();
+
+	IF EXISTS(Select * from LoginRecord where cLoginCode=chLoginCode and dLogout is null)
+	THEN		
+		Select cLoginRecordCode into @LoginRecordCode from LoginRecord where cLoginCode=chLoginCode and dLogout is null;
+
+		UPDATE LoginRecord
+		SET dLogout=@LogoutTime
+		WHERE cLoginRecordCode=@LoginRecordCode;
+
+		/*SELECT 'Out' AS "cState";		
+	ELSE
+		SELECT 'Error' AS "cState"; */
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnConfirmLogin`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnConfirmLogin`(
+vhUserName Varchar(10),
+vhPassword Varchar(10),
+vhComputerName varchar(50)
+)
+BEGIN
+	CALL prnGenLoginRecordCode(@cLoginRecordCode);
+	SET @LoginTime=NOW();
+
+	IF EXISTS(Select * from Login where vUserName=vhUserName and vPassword=vhPassword and cStatus='Active')
+	THEN
+		SELECT cLoginCode INTO @LoginCode FROM Login where vUserName=vhUserName and vPassword=vhPassword;
+
+		CALL prnConfirmLogout(@LoginCode);
+
+		INSERT INTO LoginRecord
+		VALUES(@cLoginRecordCode,@LoginCode,@LoginTime,null,vhComputerName);
+
+		SELECT 'Active' AS "cState";
+	END IF;
+	IF EXISTS(Select * from Login where vUserName=vhUserName and vPassword=vhPassword and cStatus='Blocked')
+	THEN
+		SELECT 'Blocked' AS "cState";
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnDeleteCreditOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnDeleteCreditOrder`(
+chCreditOrderCode Char(9),
+chConsentID char(9)
+)
+BEGIN
+	SET @DeleteDate=NOW();
+
+	UPDATE CreditOrder
+	SET cConsentID=@ConsentID,dConsentDate=@DeleteDate,cStatus='deleted'
+	WHERE cRefID=chCreditOrderCode;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnDeleteDebitOrder`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnDeleteDebitOrder`(
+chDebitOrderCode Char(9),
+chConsentID char(9)
+)
+BEGIN
+	SET @DeleteDate=NOW();
+
+	UPDATE DebitOrder
+	SET cConsentID=@ConsentID,dConsentDate=@DeleteDate,cStatus='deleted'
+	WHERE cRefID=chDebitOrderCode;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsBackupRecord`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsBackupRecord`(
+vhBackupType varchar(40),
+cBackupById char(9),
+vhDatabaseName Varchar(40)
+)
+BEGIN
+	CALL prnGenBackupRecordCode(@BackupRecordCode);
+	SET @BackupTime=NOW();
+
+		INSERT INTO BackupRecord
+		VALUES(@BackupRecordCode,cBackupById,vhBackupType,@BackupTime);
+
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintLastDebitOrderSummaryInt`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintLastDebitOrderSummaryInt`(IN chDebitOrderCode char(9),OUT itSerial int)
+BEGIN
+
+	DECLARE done int DEFAULT 0;
+	DECLARE cur1 Cursor for	SELECT iSerial FROM DebitOrderSummary WHERE cDebitOrderCode=chDebitOrderCode;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+
+OPEN cur1;
+
+	REPEAT
+	FETCH cur1 INTO itSerial;
+	UNTIL done END REPEAT;
+	IF(itSerial is null)
+	THEN
+		SET itSerial=0;
+	END IF;
+
+CLOSE cur1; 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintLastDebitOrderCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintLastDebitOrderCode`()
+BEGIN
+
+	DECLARE done int DEFAULT 0;
+	DECLARE chDebitOrderCode char(9);
+	DECLARE cur1 Cursor for	SELECT cDebitOrderCode FROM DebitOrder;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done=1;
+
+OPEN cur1;
+
+	REPEAT
+	FETCH cur1 INTO chDebitOrderCode;
+	UNTIL done END REPEAT;
+
+	SELECT chDebitOrderCode AS 'cDebitOrderCode';
+
+CLOSE cur1;	
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnSecondFIFO`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnSecondFIFO`(
+
+chItemCode Char(9),
+chOrderCode Char(9),
+iQty int
+)BEGIN
+
+	UPDATE creditordersummary
+	SET iQtyConsumed=iQty,cTag='OUT',mAmountItemIn=0.0
+	WHERE cItemCode=chItemCode and cCreditOrderCode=chOrderCode;
+
+
+ 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnFirstFIFO`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnFirstFIFO`(
+
+chItemCode Char(9),
+chOrderCode Char(9),
+iQtyConsumed int,
+iQty int,
+vhConsumedCost varchar(50),
+vhRate varchar(50)
+)BEGIN
+
+	SET @CostQuantityIn=(iQty-iQtyConsumed) * CAST(vhRate AS decimal(50,2));
+	SET @consumedcost=CAST(vhConsumedCost AS decimal(50,2));
+	
+	IF (iQty > iQtyConsumed)
+	THEN
+		SET @tag='IN';
+	ELSE
+		SET @tag='OUT';
+	END IF;
+
+	UPDATE creditordersummary
+	SET iQtyConsumed=iQtyConsumed,cTag=@tag,mAmountItemIn=@CostQuantityIn
+	WHERE cItemCode=chItemCode and cCreditOrderCode=chOrderCode;
+
+ 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnFIFOEnd`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdCreditOrderSummaryOnFIFOEnd`(
+chItemCode Char(9)
+)BEGIN
+	UPDATE creditordersummary join creditorder on creditOrderSummary.cCreditOrderCode=creditOrder.cCreditOrderCode
+	SET cTag='OUT'
+	WHERE creditOrderSummary.cItemCode=chItemCode and CreditOrder.cAccountCode IN (Select cAccountCode From Account where cCategory='REVENUE' or cCategory='INVENTORY RECEIVABLE');
+
+ 
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderSummaryOnFIFOPayableEnd`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderSummaryOnFIFOPayableEnd`(
+chItemCode Char(9)
+)BEGIN
+
+	UPDATE debitordersummary join debitorder on debitOrderSummary.cDebitOrderCode=debitOrder.cDebitOrderCode
+	SET cTag='OUT'
+	WHERE debitOrderSummary.cItemCode=chItemCode and DebitOrder.cAccountCode IN (Select cAccountCode From Account where cCategory='INVENTORY PAYABLE');
+ 
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderSummaryOnFIFOEnd`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdDebitOrderSummaryOnFIFOEnd`(
+chItemCode Char(9)
+)BEGIN
+
+	UPDATE debitordersummary join debitorder on debitOrderSummary.cDebitOrderCode=debitOrder.cDebitOrderCode
+	SET cTag='OUT'
+	WHERE debitOrderSummary.cItemCode=chItemCode and DebitOrder.cAccountCode IN (Select cAccountCode From Account where cCategory='INVENTORY');
+
+ 
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderOnFIFO`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderOnFIFO`(
+chAccountCode char(9),
+chTag char(3),
+chOrderbyID char(9)
+)
+BEGIN
+	CALL prnGenDebitRefId(@RefID);
+	CALL prnGenDebitCode(@DebitCode);
+	CALL prnGenDebitOrderCode(@DebitOrderCode);
+
+	SET @OrderDate=NOW();
+	SET @NewToBalance=0;
+
+	SELECT cOrderCode,cTag INTO @OrderCode,@Tag FROM Account WHERE cAccountCode=chAccountCode;
+
+	IF(NOT chTag=@Tag)
+	THEN
+
+	Update Account
+	SET cTag=chTag,cOrderCode=@DebitOrderCode 
+	WHERE cAccountCode=chAccountCode;
+
+	INSERT INTO DebitOrder
+	VALUES(@DebitOrderCode,'VD0000001',chAccountCode,@DebitCode,@OrderDate,chOrderbyID,@OrderDate,chOrderbyID,@OrderDate,null,
+		@OrderDate,null,null,'0.00',@NewToBalance,'posted',
+		' ','posted','Investing Activity','DC',@RefID);
+
+		
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderSummaryOnFIFO`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsDebitOrderSummaryOnFIFO`(
+chAccountCode char(9),
+vItemName varchar(50),
+tDescription text,
+vAmountV varchar(50)
+)
+BEGIN
+	SELECT cOrderCode INTO @OrderCode FROM Account where cAccountCode=chAccountCode;
+	CALL prnGenItemCodeForName(vItemName,@ItemCode);
+	CALL prnPrintLastDebitOrderSummaryInt(@OrderCode,@iSerial);
+
+	SET @newSerial=@iSerial+1;
+	SET @Amount=CAST(vAmountV AS Decimal(50,2));
+	INSERT INTO DebitOrderSummary
+	VALUES(@OrderCode,@ItemCode,tDescription,@Amount,@newSerial,'OUT',0,@Amount); 
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnDebitAccountOnFIFO`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnDebitAccountOnFIFO`(IN chDebitOrderCode char(9))
+BEGIN
+
+	SELECT cCostOrderCode,cAccountCode,mTotalAmount,cDebitCode INTO @DebitCostOrderCode,@AccountCode,@DebitAmount,@DebitCode FROM DebitOrder WHERE cDebitOrderCode=chDebitOrderCode;
+
+	SELECT SUM(mAmount) INTO @DebitAmount From DebitOrderSummary where cDebitOrderCode=chDebitOrderCode;
+
+	UPDATE DebitOrder
+	SET mTotalAmount=@DebitAmount
+	WHERE cDebitOrderCode=chDebitOrderCode;
+
+	SELECT mAmount INTO @OldBalance from Account where Account.cAccountCode=@AccountCode;
+
+	SET @NewBalance = @OldBalance-@DebitAmount;
+
+	CALL prnGenPayCode(@PayCode);
+
+	UPDATE Account
+	SET mAmount=@NewBalance
+	WHERE Account.cAccountCode=@AccountCode;
+
+	INSERT INTO Pay
+	VALUES(@PayCode,@AccountCode,null,@DebitCode,@DebitAmount,@NewBalance);
+	
+END$$
+
+DELIMITER ;
+
+CREATE VIEW vwPostedCreditOrder
+AS
+SELECT cCreditOrderCode AS "cCreditOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From CreditOrder 
+where cStatus='posted';
+
+CREATE VIEW vwPendingCreditOrder
+AS
+SELECT cCreditOrderCode AS "cCreditOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From CreditOrder 
+where cStatus='pending';
+
+CREATE VIEW vwDeletedCreditOrder
+AS
+SELECT cCreditOrderCode AS "cCreditOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From CreditOrder 
+where cStatus='deleted';
+
+CREATE VIEW vwPostedDebitOrder
+AS
+SELECT cDebitOrderCode AS "cDebitOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From DebitOrder 
+where cStatus='posted';
+
+CREATE VIEW vwDeletedDebitOrder
+AS
+SELECT cDebitOrderCode AS "cDebitOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From DebitOrder 
+where cStatus='deleted';
+
+CREATE VIEW vwPendingDebitOrder
+AS
+SELECT cDebitOrderCode AS "cDebitOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From DebitOrder 
+where cStatus='pending';
+
+CREATE VIEW vwApprovedDebitOrder
+AS
+SELECT cDebitOrderCode AS "cDebitOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From DebitOrder 
+where cStatus='approved';
+
+CREATE VIEW vwApprovedCreditOrder
+AS
+SELECT cCreditOrderCode AS "cCreditOrderCode",cMerchantID AS "cMerchantID",mTotalAmount AS "mTotalAmount" From CreditOrder 
+where cStatus='approved';
+/* -- */
+CREATE VIEW vwTransferAccount
+AS
+SELECT * From Account
+where cCategory = 'REVENUE' or cCategory = 'EXPENSE' or cCategory = 'HYBRID' or cCategory = 'RECEIVABLE' or cCategory = 'PAYABLE';
+ 
+CREATE VIEW vwSolidReceivablesAccount
+AS
+SELECT * From Account
+where cCategory='INVENTORY RECEIVABLE';
+  
+CREATE VIEW vwSolidPayablesAccount
+AS
+SELECT * From Account
+where cCategory='INVENTORY PAYABLE';
+
+CREATE VIEW vwCreditAccount
+AS
+SELECT * From Account
+where cCategory != 'EXPENSE' and cCategory != 'INVENTORY PAYABLE';
+  
+CREATE VIEW vwDebitAccount
+AS
+SELECT * From Account
+where cCategory != 'REVENUE' and cCategory != 'INVENTORY PAYABLE';
+  
+CREATE VIEW vwExpenseInventoryAccount
+AS
+SELECT * From Account
+where cCategory = 'EXPENSE' or cCategory='INVENTORY';
+    
+CREATE VIEW vwExpenseRevenueAccount
+AS
+SELECT * From Account
+where cCategory = 'EXPENSE' or cCategory='REVENUE';
+    
+CREATE VIEW vwTradingAccount
+AS
+SELECT * From Account
+where cTradingType = 'PURCHASE' or cTradingType='SALE' or cTradingType='STOCK';
+    
+CREATE VIEW vwCashFlowsAccount
+AS
+SELECT * From Account
+where cActivity != 'N/A' ;
+
+CREATE VIEW vwInventoryRevenueAccount
+AS
+SELECT * From Account
+where cCategory = 'REVENUE' or cCategory='INVENTORY';
+   
+CREATE VIEW vwInventoryAccount
+AS
+SELECT * From Account
+where cCategory='INVENTORY';
+
+CALL prnInsCustomer('ANONYMOUS','ANONYMOUS','ANONYMOUS','ANONYMOUS','NIGERIA','','0','');
+CALL prnInsVendor('ANONYMOUS','ANONYMOUS','ANONYMOUS','ANONYMOUS','NIGERIA','','0','');
+
+CALL prnInsCurrency('NGN');
+CALL prnInsCurrency('USD');
+
+CALL prnInsItemCategory('ACCOUNTING');
+CALL prnInsItem('COSTING','For debiting of inventory account with cost price of items converted to revenue','Non-Stock','ACCOUNTING','','0','','0.00');
+CALL prnInsItem('DEPRECIATION','The charge with respect to fixed assets / intangible assets that have been capitalised on the balance sheet for a specific (accounting) period.','Non-Stock','ACCOUNTING','','0','','0.00');
+
+CALL prnInsCountry('NIGERIA');
+CALL prnInsCountry('CANADA'); 
+CALL prnInsCountry('UNITED KINGDOM');
+CALL prnInsCountry('U.S.A');
+CALL prnInsCountry('FRANCE');
+CALL prnInsCountry('GERMANY');
+CALL prnInsCountry('JAPAN');
+CALL prnInsCountry('AFGHANISTAN');
+CALL prnInsCountry('ALBANIA');
+CALL prnInsCountry('ALGERIA');
+CALL prnInsCountry('AMERICAN SAMOA');
+CALL prnInsCountry('ANDORRA');
+CALL prnInsCountry('AN LA');
+CALL prnInsCountry('ANGUILLA');  
+CALL prnInsCountry('ANTIGUA AND BARBUDA');
+CALL prnInsCountry('ARGENTINA');
+CALL prnInsCountry('ARMENIA');
+CALL prnInsCountry('ARUBA');
+CALL prnInsCountry('AUSTRALIA');
+CALL prnInsCountry('AUSTRIA');
+CALL prnInsCountry('AZERBAIJAN');  
+CALL prnInsCountry('BAHAMAS');
+CALL prnInsCountry('BAHRAIN');
+CALL prnInsCountry('BANGLADESH');  
+CALL prnInsCountry('BARBADOS');
+CALL prnInsCountry('BELARUS');
+CALL prnInsCountry('BELGIUM');
+CALL prnInsCountry('BELIZE');
+CALL prnInsCountry('BENIN');
+CALL prnInsCountry('BERMUDA'); 
+CALL prnInsCountry('BHUTAN');
+CALL prnInsCountry('BOLIVIA');
+CALL prnInsCountry('BOSNIA & H');
+CALL prnInsCountry('BOTSWANA');
+CALL prnInsCountry('BRAZIL');
+CALL prnInsCountry('BRUNEI DARUSSALAM');
+CALL prnInsCountry('BULGARIA');
+CALL prnInsCountry('BURKINA FASO');
+CALL prnInsCountry('BURUNDI');
+CALL prnInsCountry('CAMBODIA');
+CALL prnInsCountry('CAMEROON');
+CALL prnInsCountry('CAPE VERDE'); 
+CALL prnInsCountry('CAYMAN ISLANDS');
+CALL prnInsCountry('CENTRAL AFRICAN');
+CALL prnInsCountry('REPUBLIC');
+CALL prnInsCountry('CHAD');
+CALL prnInsCountry('CHILE');
+CALL prnInsCountry('CHINA');
+CALL prnInsCountry('CHRISTMAS ISLAND');
+CALL prnInsCountry('COCOS (KEELING)');
+CALL prnInsCountry('ISLANDS');
+CALL prnInsCountry('COLOMBIA');
+CALL prnInsCountry('COMOROS');
+CALL prnInsCountry('CON(');
+CALL prnInsCountry('COOK ISLANDS');
+CALL prnInsCountry('COSTA RICA');
+CALL prnInsCountry('COTE D IVOIRE');  
+CALL prnInsCountry('CROATIA (HRVATSKA)');
+CALL prnInsCountry('CYPRUS');
+CALL prnInsCountry('CZECH REPUBLIC');
+CALL prnInsCountry('DENMARK');
+CALL prnInsCountry('DJIBOUTI');
+CALL prnInsCountry('DOMINICA');
+CALL prnInsCountry('DOMINICAN REPUBLIC');
+CALL prnInsCountry('ECUADOR');
+CALL prnInsCountry('EGYPT');
+CALL prnInsCountry('EL SALVADOR');
+CALL prnInsCountry('EQUATORIAL GUINEA');
+CALL prnInsCountry('ERITREA');
+CALL prnInsCountry('ESTONIA');
+CALL prnInsCountry('ETHIOPIA');
+CALL prnInsCountry('FALKLAND ISLANDS');
+CALL prnInsCountry('FAROE ISLANDS');
+CALL prnInsCountry('FIJI');
+CALL prnInsCountry('FINLAND');  
+CALL prnInsCountry('FRENCH GUIANA');
+CALL prnInsCountry('FRENCH POLYNESIA');  
+CALL prnInsCountry('GABON');
+CALL prnInsCountry('GAMBIA GEORGIA');
+CALL prnInsCountry('GHANA');
+CALL prnInsCountry('GIBRALTAR');
+CALL prnInsCountry('GREECE');
+CALL prnInsCountry('GREENLAND');  
+CALL prnInsCountry('GRENADA');
+CALL prnInsCountry('GUADELOUPE');  
+CALL prnInsCountry('GUAM');
+CALL prnInsCountry('GUATEMALA');
+CALL prnInsCountry('GUINEA');
+CALL prnInsCountry('GUINEA-BISSAU');
+CALL prnInsCountry('GUYANA');
+CALL prnInsCountry('HAITI');
+CALL prnInsCountry('HOLY SEE ');
+CALL prnInsCountry('HONDURAS');
+CALL prnInsCountry('HONG KONG');  
+CALL prnInsCountry('HUNGARY');  
+CALL prnInsCountry('ICELAND');  
+CALL prnInsCountry('INDIA');  
+CALL prnInsCountry('INDONESIA');  
+CALL prnInsCountry('IRELAND');  
+CALL prnInsCountry('ISRAEL');  
+CALL prnInsCountry('ITALY');  
+CALL prnInsCountry('JAMAICA');  
+CALL prnInsCountry('JORDAN');  
+CALL prnInsCountry('KAZAKHSTAN');  
+CALL prnInsCountry('KENYA');  
+CALL prnInsCountry('KIRIBATI');  
+CALL prnInsCountry('SOUTH KOREA');  
+CALL prnInsCountry('KUWAIT');  
+CALL prnInsCountry('KYRGYZSTAN');  
+CALL prnInsCountry('LAOS');  
+CALL prnInsCountry('LATVIA');  
+CALL prnInsCountry('LEBANON');  
+CALL prnInsCountry('LESOTHO');  
+CALL prnInsCountry('LIBERIA');  
+CALL prnInsCountry('LIECHTENSTEIN');  
+CALL prnInsCountry('LITHUANIA');  
+CALL prnInsCountry('LUXEMBOURG');  
+CALL prnInsCountry('MACAU');  
+CALL prnInsCountry('MACEDONIA');  
+CALL prnInsCountry('MADAGASCAR');  
+CALL prnInsCountry('MALAWI');  
+CALL prnInsCountry('MALAYSIA');  
+CALL prnInsCountry('MALDIVES');  
+CALL prnInsCountry('MALI');  
+CALL prnInsCountry('MALTA');  
+CALL prnInsCountry('MARSHALL');  
+CALL prnInsCountry('MARTINIQUE');  
+CALL prnInsCountry('MAURITANIA');  
+CALL prnInsCountry('MAURITIUS');  
+CALL prnInsCountry('MAYOTTE');  
+CALL prnInsCountry('MEXICO');  
+CALL prnInsCountry('MICRONESIA');  
+CALL prnInsCountry('MOLDOVA');  
+CALL prnInsCountry('MONACO');  
+CALL prnInsCountry('MON LIA');  
+CALL prnInsCountry('MONTSERRAT');  
+CALL prnInsCountry('MOROCCO');  
+CALL prnInsCountry('MOZAMBIQUE');  
+CALL prnInsCountry('MYANMAR');  
+CALL prnInsCountry('NAMIBIA');  
+CALL prnInsCountry('NAURU');  
+CALL prnInsCountry('NEPAL');  
+CALL prnInsCountry('THE NETHERLANDS');  
+CALL prnInsCountry('NETHERLANDS ANTILLES');  
+CALL prnInsCountry('NEW CALEDONIA');  
+CALL prnInsCountry('NEW ZEALAND');  
+CALL prnInsCountry('NICARAGUA');  
+CALL prnInsCountry('NIGER');  
+CALL prnInsCountry('NIUE');  
+CALL prnInsCountry('NORFOLK');  
+CALL prnInsCountry('ISLAND');  
+CALL prnInsCountry('NORTHERN MARIANA');  
+CALL prnInsCountry('NORWAY');  
+CALL prnInsCountry('OMAN');  
+CALL prnInsCountry('PAKISTAN');  
+CALL prnInsCountry('PALAU');  
+CALL prnInsCountry('PANAMA');  
+CALL prnInsCountry('PAPUA NEW GUINEA');  
+CALL prnInsCountry('PARAGUAY');  
+CALL prnInsCountry('PERU');  
+CALL prnInsCountry('PHILIPPINES');  
+CALL prnInsCountry('POLAND');  
+CALL prnInsCountry('PORTUGAL');  
+CALL prnInsCountry('PUERTO RICO');  
+CALL prnInsCountry('QATAR');  
+CALL prnInsCountry('REUNION');  
+CALL prnInsCountry('ROMANIA');  
+CALL prnInsCountry('RUSSIA');  
+CALL prnInsCountry('RWANDA');  
+CALL prnInsCountry('SAINT KITTS & NEVIS');  
+CALL prnInsCountry('SAINT LUCIA');  
+CALL prnInsCountry('SAINT VINCENT & G');  
+CALL prnInsCountry('SAMOA');  
+CALL prnInsCountry('SAN MARINO');  
+CALL prnInsCountry('SAO TOME & P');  
+CALL prnInsCountry('SAUDI ARABIA');  
+CALL prnInsCountry('SENEGAL');  
+CALL prnInsCountry('SEYCHELLES');  
+CALL prnInsCountry('SIERRA LEONE');  
+CALL prnInsCountry('SINGAPORE');  
+CALL prnInsCountry('SLOVAKIA');  
+CALL prnInsCountry('SLOVENIA');  
+CALL prnInsCountry('SOLOMON');   
+CALL prnInsCountry('SOMALIA');  
+CALL prnInsCountry('SOUTH AFRICA');  
+CALL prnInsCountry('SPAIN');  
+CALL prnInsCountry('SRI LANKA');  
+CALL prnInsCountry('ST. HELENA');  
+CALL prnInsCountry('ST. PIERRE & M');  
+CALL prnInsCountry('SURINAME');  
+CALL prnInsCountry('SVALBARD & J ISLANDS');  
+CALL prnInsCountry('SWAZILAND');  
+CALL prnInsCountry('SWEDEN');  
+CALL prnInsCountry('SWITZERLAND');  
+CALL prnInsCountry('TAIWAN');  
+CALL prnInsCountry('TAJIKISTAN');  
+CALL prnInsCountry('TANZANIA');  
+CALL prnInsCountry('THAILAND');  
+CALL prnInsCountry('TOGO');  
+CALL prnInsCountry('TONGA');  
+CALL prnInsCountry('TRINIDAD AND TOBA');  
+CALL prnInsCountry('TUNISIA');
+CALL prnInsCountry('TURKEY');  
+CALL prnInsCountry('TURKMENISTAN');  
+CALL prnInsCountry('TURKS & C ISLANDS');  
+CALL prnInsCountry('TUVALU');  
+CALL prnInsCountry('UGANDA');  
+CALL prnInsCountry('UKRAINE');  
+CALL prnInsCountry('UNITED ARAB EMIRATES');  
+CALL prnInsCountry('URUGUAY');  
+CALL prnInsCountry('UZBEKISTAN');  
+CALL prnInsCountry('VANUATU');  
+CALL prnInsCountry('VENEZUELA');  
+CALL prnInsCountry('VIET NAM');  
+CALL prnInsCountry('VIRGIN ISLANDS(BRI)');  
+CALL prnInsCountry('VIRGIN ISLANDS(U.S.)');  
+CALL prnInsCountry('WALLIS & F ISLANDS');  
+CALL prnInsCountry('WESTERN SAHARA');  
+CALL prnInsCountry('YEMEN');  
+CALL prnInsCountry('YU SLAVIA');  
+CALL prnInsCountry('ZAIRE');  
+CALL prnInsCountry('ZAMBIA');  
+CALL prnInsCountry('ZIMBABWE');
+
+DROP VIEW IF EXISTS `milliscriptmoneyspinnerasxtrial`.`vwMerchant`;
+CREATE VIEW `milliscriptmoneyspinnerasxtrial`.`vwMerchant`
+AS
+SELECT cVendorID AS "cMerchantID",vName,mAccountBalance,'Vendor' AS "vTable" From Vendor
+union
+SELECT cCustomerID,vName,mAccountBalance,'Customer' From Customer
+union
+SELECT cDesignationCode,vDesignationName,mAccountBalance,'Designation' From Designation
+union
+SELECT cDepartmentCode,vDepartmentName,0.00 AS mAccountBalance,'Department' From Department
+union
+SELECT cEmployeeID,CONCAT(vFirstName,' ',vMiddleName,' ',vLastName) AS "vName",mAccountBalance,'Employee' From Employee;
+
+
+/** PATH TO UPGRADE MILLISCRIPT MONEYSPINNER AX 1.4.0 
+INTO MILLISCRIPT MONEYSPINNER ASX 1.4.0 **/
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Programme`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Programme`
+(
+cProgrammeCode char(9)not null PRIMARY KEY,
+vName varchar(50) not null unique
+);
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Sponsor`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Sponsor`
+(
+cSponsorID char(9),
+cStudentID char(9),
+vFullName Varchar(60),
+vPhone	varchar(40),
+vAddress	varchar(80),
+vPostalAddress varchar(60),
+vEmail varchar(40),
+dDateRecorded Datetime not null
+);
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Batch`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Batch`
+(
+cBatchCode char(9) not null PRIMARY KEY,
+cProgrammeCode Char(9) not null
+REFERENCES Programme(cProgrammeCode),
+cSession Char(9) not null,
+cFacilitatorCode Char(9)
+REFERENCES Employee(cEmployeeID),
+dStartDate datetime not null,
+dEndDate datetime,
+tRemark text
+);
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Student`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Student`
+(
+cStudentID char(9)not null
+PRIMARY KEY,
+vFirstName varchar(20) not null,
+vMiddleName varchar(20) not null,
+vLastName varchar(20) not null,
+vAddress varchar(40),
+cCity char(10),
+cState char(10),
+cCountryCode Char(3) not null,
+cZip char(5),
+cSex char(1) not null,
+dDateofBirth Datetime not null,
+cPhone char(11) not null,
+vPostal varchar(60),
+vEmail varchar(40),
+vStatus varchar(10) not null,
+dDateRecorded Datetime not null,
+cLastBatchCode char(9)
+REFERENCES Batch(cBatchCode)
+);
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Registration`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Registration`
+(
+cRegistrationCode char(9) not null PRIMARY KEY,
+cStudentID Char(9) not null
+REFERENCES Student(cStudentID),
+cBatchCode Char(9)
+REFERENCES Batch(cBatchCode),
+cProgrammeCode Char(9) not null
+REFERENCES Programme(cProgrammeCode),
+cCreditCode char(9),
+tRemark text
+);
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenRegistrationCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenRegistrationCode`(OUT RegistrationCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cRegistrationCode) into COUNTER FROM Registration;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<9 THEN
+		SET RegistrationCode=CONCAT('RG000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9 and COUNTER<99 THEN
+		SET RegistrationCode=CONCAT('RG00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99 and COUNTER<999 THEN
+		SET RegistrationCode=CONCAT('RG0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999 and COUNTER<9999 THEN
+		SET RegistrationCode=CONCAT('RG000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9999 and COUNTER<99999 THEN
+		SET RegistrationCode=CONCAT('RG00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99999 and COUNTER<999999 THEN
+		SET RegistrationCode=CONCAT('RG0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999999 THEN SET RegistrationCode=CONCAT('RG',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenStudentID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenStudentID`(OUT StudentID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cStudentID) into COUNTER FROM Student;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<9 THEN
+		SET StudentID=CONCAT('ST000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9 and COUNTER<99 THEN
+		SET StudentID=CONCAT('ST00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99 and COUNTER<999 THEN
+		SET StudentID=CONCAT('ST0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999 and COUNTER<9999 THEN
+		SET StudentID=CONCAT('ST000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9999 and COUNTER<99999 THEN
+		SET StudentID=CONCAT('ST00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99999 and COUNTER<999999 THEN
+		SET StudentID=CONCAT('ST0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999999 THEN SET StudentID=CONCAT('ST',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenProgrammeCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenProgrammeCode`(OUT ProgrammeCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cProgrammeCode) into COUNTER FROM Programme;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<9 THEN
+		SET ProgrammeCode=CONCAT('PG000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9 and COUNTER<99 THEN
+		SET ProgrammeCode=CONCAT('PG00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99 and COUNTER<999 THEN
+		SET ProgrammeCode=CONCAT('PG0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999 and COUNTER<9999 THEN
+		SET ProgrammeCode=CONCAT('PG000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9999 and COUNTER<99999 THEN
+		SET ProgrammeCode=CONCAT('PG00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99999 and COUNTER<999999 THEN
+		SET ProgrammeCode=CONCAT('PG0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999999 THEN SET ProgrammeCode=CONCAT('PG',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenSponsorID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenSponsorID`(OUT SponsorID char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cSponsorID) into COUNTER FROM Sponsor;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<9 THEN
+		SET SponsorID=CONCAT('SP000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9 and COUNTER<99 THEN
+		SET SponsorID=CONCAT('SP00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99 and COUNTER<999 THEN
+		SET SponsorID=CONCAT('SP0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999 and COUNTER<9999 THEN
+		SET SponsorID=CONCAT('SP000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9999 and COUNTER<99999 THEN
+		SET SponsorID=CONCAT('SP00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99999 and COUNTER<999999 THEN
+		SET SponsorID=CONCAT('SP0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999999 THEN SET SponsorID=CONCAT('SP',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenBatchCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenBatchCode`(OUT BatchCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cBatchCode) into COUNTER FROM Batch;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<9 THEN
+		SET BatchCode=CONCAT('BT000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9 and COUNTER<99 THEN
+		SET BatchCode=CONCAT('BT00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99 and COUNTER<999 THEN
+		SET BatchCode=CONCAT('BT0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999 and COUNTER<9999 THEN
+		SET BatchCode=CONCAT('BT000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=9999 and COUNTER<99999 THEN
+		SET BatchCode=CONCAT('BT00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=99999 and COUNTER<999999 THEN
+		SET BatchCode=CONCAT('BT0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>=999999 THEN SET BatchCode=CONCAT('BT',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenProgrammeCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenProgrammeCodeForName`(IN ProgrammeName Varchar(40),OUT ProgrammeCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM Programme WHERE vName=ProgrammeName)
+	THEN
+		SELECT cProgrammeCode INTO ProgrammeCode FROM cProgramme WHERE vName=ProgrammeName;	
+	ELSE
+		SELECT 'Specified Programme not be found';
+	END IF;
+    END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsProgramme`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsProgramme`(
+vName Varchar(40)
+)
+BEGIN
+	CALL prnGenProgrammeCode(@ProgrammeCode);
+	INSERT INTO Programme
+	VALUES(@ProgrammeCode,vName);
+END$$
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsRegistration`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsRegistration`(
+icStudentID char(9),
+icBatchCode char(9),
+cProgrammeCode Char(9),
+cCreditCode Char(9),
+tRemark text
+)
+BEGIN
+	CALL prnGenRegistrationCode(@RegistrationCode);
+	INSERT INTO Registration
+	VALUES(@RegistrationCode,icStudentID,icBatchCode,cProgrammeCode,cCreditCode,
+		tRemark);
+
+	UPDATE Student
+	SET cLastBatchCode=icBatchCode
+	WHERE cStudentID=icStudentID;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsBatch`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsBatch`(
+icProgrammeCode Char(9),
+icSession Char(9),
+icFacilitatorID char(9),
+idStartDate datetime,
+idEndDate datetime,
+itRemark text
+)
+BEGIN
+	CALL prnGenBatchCode(@BatchCode);
+
+	INSERT INTO Batch
+	VALUES(@BatchCode,icProgrammeCode,icSession,icFacilitatorID,idStartDate,
+		idEndDate,itRemark);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsSponsor`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsSponsor`(
+icStudentID char(9),
+ivFullName varChar(60),
+ivPhone varChar(40),
+ivAddress varChar(80),
+ivPostalAddress varChar(60),
+ivEmail varChar(40)
+)
+BEGIN
+	CALL prnGenSponsorID(@SponsorID);
+
+	INSERT INTO Sponsor
+	VALUES(@SponsorID,icStudentID,ivFullName,ivPhone,ivAddress,ivPostalAddress,
+		ivEmail,NOW());
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdSponsor`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdSponsor`(
+icStudentID char(9),
+ivFullName varChar(60),
+ivPhone varChar(40),
+ivAddress varChar(80),
+ivPostalAddress varChar(60),
+ivEmail varChar(40)
+)
+BEGIN
+
+	IF EXISTS(SELECT * FROM Sponsor WHERE cStudentID=icStudentID)
+	THEN	
+		UPDATE Sponsor
+		SET vFullName=ivFullName,vPhone=ivPhone, vAddress=ivAddress, vPostalAddress=ivPostalAddress, vEmail=ivEmail
+		WHERE cStudentID=icStudentID;
+
+
+	ELSE
+		CALL prnInsSponsor(icStudentID,ivFullName,ivPhone,ivAddress,ivPostalAddress,ivEmail);
+	END IF;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsStudent`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsStudent`(
+icStudentID char(9),
+ivFirstName Varchar(20),
+ivMiddleName Varchar(20),
+ivLastName Varchar(20),
+ivAddress Varchar(40),
+icCity Char(10),
+icState Char(10),
+ivCountryName Varchar(40),
+icZip Char(5),
+icSex Char(1),
+idDateofBirth Datetime,
+icPhone Char(15),
+ivPostal varchar(60),
+ivEmail varchar(40),
+ivStatus varchar(10)
+)
+BEGIN
+	CALL prnGenCountryCodeForName(ivCountryName,@CountryCode);
+
+	SET @DateRecorded=NOW();
+
+	INSERT INTO Student
+	VALUES(icStudentID,ivFirstName,ivMiddleName,ivLastName,ivAddress,icCity,icState,@CountryCode,icZip,
+		icSex,idDateofBirth,icPhone,ivPostal,ivEmail,ivStatus,@DateRecorded,null);
+
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintStudentID`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintStudentID`()
+BEGIN
+	CALL prnGenStudentID(@StudentID);
+
+	SELECT @StudentID AS "cStudentID";
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdStudent`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdStudent`(
+icStudentID char(9),
+ivLastName Varchar(20),
+ivAddress Varchar(40),
+icState Char(10),
+icCity Char(10),
+icZip Char(5),
+ivCountryName Varchar(40),
+icPhone Char(15),
+ivPostal varchar(60),
+ivEmail varchar(40),
+ivStatus varchar(10)
+)
+BEGIN
+	CALL prnGenCountryCodeForName(ivCountryName,@CountryCode);
+	
+	UPDATE Student
+	SET vLastName=ivLastName,vAddress=ivAddress,cState=icState,cCity=icCity,cZip=icZip,
+	cCountryCode=@CountryCode,cPhone=icPhone,
+	vPostal=ivPostal,vEmail=ivEmail,vStatus=ivStatus
+	WHERE cStudentID=icStudentID;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdBatch`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdBatch`(
+icBatchCode char(9),
+idEndDate datetime,
+itRemark text
+)
+BEGIN
+	UPDATE Batch
+	SET dEndDate=idEndDate,tRemark=itRemark
+	WHERE cBatchCode=icBatchCode;
+
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdRegistration`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdRegistration`(
+icRegistrationCode char(9),
+icBatchCode char(9),
+icProgrammeCode Char(9),
+itRemark text
+)
+BEGIN
+	UPDATE Registration
+	SET cBatchCode=icBatchCode,cProgrammeCode=icProgrammeCode,tRemark=itRemark
+	WHERE cRegistrationCode=icRegistrationCode;
+
+END$$
+
+DELIMITER ;
+
+
+DROP VIEW IF EXISTS `milliscriptmoneyspinnerasxtrial`.`vwMerchant`;
+CREATE VIEW `milliscriptmoneyspinnerasxtrial`.`vwMerchant`
+AS
+SELECT cVendorID AS "cMerchantID",vName,mAccountBalance,'Vendor' AS "vTable" From Vendor
+union
+SELECT cCustomerID,vName,mAccountBalance,'Customer' From Customer
+union
+SELECT cDesignationCode,vDesignationName,mAccountBalance,'Designation' From Designation
+union
+SELECT cDepartmentCode,vDepartmentName,0.00 AS mAccountBalance,'Department' From Department
+union
+SELECT cEmployeeID,CONCAT(vFirstName,' ',vMiddleName,' ',vLastName) AS vName,mAccountBalance,'Employee' From Employee
+union
+SELECT cStudentID,CONCAT(vFirstName,' ',vMiddleName,' ',vLastName) AS vName,0.00 AS mAccountBalance,'Student' From Student
+union
+SELECT cReferenceTableCode,vName,0.00 AS mAccountBalance,'ReferenceTable' From ReferenceTable;
+
+
+
+
+
+
+//profile extension
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`ReferenceTable`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`ReferenceTable`
+(
+cReferenceTableCode char(9) not null
+PRIMARY KEY,
+vName varchar(50) unique not null,
+cPrefix char(2) unique,
+vPrimaryKey varchar(50) unique not null,
+dDateCreated datetime not null,
+cMultirow CHAR(1) not null,
+cPrimaryTableCode CHAR(9)
+)
+;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenReferenceTableCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenReferenceTableCode`(OUT ReferenceTableCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cReferenceTableCode) into COUNTER FROM ReferenceTable;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ReferenceTableCode=CONCAT('RF000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ReferenceTableCode=CONCAT('RF00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ReferenceTableCode=CONCAT('RF0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ReferenceTableCode=CONCAT('RF000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ReferenceTableCode=CONCAT('RF00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ReferenceTableCode=CONCAT('RF0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ReferenceTableCode=CONCAT('RF',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenReferenceTableCodeForName`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenReferenceTableCodeForName`(IN ReferenceTableName Varchar(50),OUT ReferenceTableCode Char(9))
+
+    BEGIN
+	IF EXISTS(SELECT * FROM ReferenceTable WHERE vReferenceTableName=ReferenceTableName)
+	THEN
+		SELECT cReferenceTableCode INTO ReferenceTableCode FROM ReferenceTable WHERE vReferenceTableName=ReferenceTableName;
+	
+	ELSE
+		SELECT 'Specified ReferenceTable not be found';
+	END IF;
+
+    END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnPrintReferenceTableCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnPrintReferenceTableCode`()
+BEGIN
+	call prnGenReferenceTableCode(@s);
+	SELECT @S AS 'cCode';
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsReferenceTable`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsReferenceTable`(IN ReferenceTableName Varchar(50),IN ReferenceTablePrefix char(2),IN ReferenceTablePrimaryKey varchar(50),IN MultiRow char(1),IN PrimaryTableCode char(9))
+BEGIN
+	call prnGenReferenceTableCode(@ReferenceTableCode);
+	SET @OrderDate=NOW();
+	IF (ReferenceTablePrefix ='')
+	THEN
+		SET ReferenceTablePrefix = null;
+	END IF;
+	INSERT INTO ReferenceTable
+	VALUES(@ReferenceTableCode,ReferenceTableName,ReferenceTablePrefix,ReferenceTablePrimaryKey,@OrderDate,MultiRow,PrimaryTableCode);
+END$$
+
+DELIMITER ;
+    
+Call prnInsReferenceTable('COUNTRY','','cCountryCode','0','');
+Call prnInsReferenceTable('CURRENCEY','CY','cCurrencyCode','0','');
+Call prnInsReferenceTable('Department','DP','cDepartmentCode','0','');
+Call prnInsReferenceTable('Designation','DG','cDesignationCode','0','');
+Call prnInsReferenceTable('Bank','BK','cBankCode','0','');
+Call prnInsReferenceTable('Employee','EM','cEmployeeID','0','');
+Call prnInsReferenceTable('Login','LG','cLoginCode','0','');
+Call prnInsReferenceTable('LoginRecord','LR','cLoginRecordCode','0','');
+Call prnInsReferenceTable('Customer','CU','cCustomerID','0','');
+Call prnInsReferenceTable('Account','AC','cAccountCode','0','');
+Call prnInsReferenceTable('Vendor','VD','cVendorID','0','');
+Call prnInsReferenceTable('TransactionType','TT','cTransactionTypeCode','0','');
+Call prnInsReferenceTable('CreditOrder','CO','cCreditOrderCode','0','');
+Call prnInsReferenceTable('DebitOrder','DO','cDebitOrderCode','0','');
+Call prnInsReferenceTable('Item','IT','cItemCode','0','');
+Call prnInsReferenceTable('ItemCategory','IC','cItemCategoryCode','0','');
+Call prnInsReferenceTable('ItemHistory','IH','cItemHistoryCode','0','');
+Call prnInsReferenceTable('ItemUnit','IU','cItemUnitCode','0','');
+Call prnInsReferenceTable('ItemUnitConversion','IV','cItemUnitConversionCode','0','');
+Call prnInsReferenceTable('ItemLocation','IL','cItemLocationCodee','0','');
+Call prnInsReferenceTable('BackupRecord','BR','cBackupRecordCode','0','');
+Call prnInsReferenceTable('Groups','GP','cGroupCode','0','');
+Call prnInsReferenceTable('Registration','RG','cRegistrationCode','0','');
+Call prnInsReferenceTable('Student','ST','cStudentID','0','');
+Call prnInsReferenceTable('Programme','PG','cProgrammeCode','0','');
+Call prnInsReferenceTable('Sponsor','SP','cSponsorID','0','');
+Call prnInsReferenceTable('Batch','BT','cBatchCode','0','');
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`Profile`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`Profile`
+(
+cProfileCode char(9) not null
+REFERENCES ReferenceTable(cReferenceTableCode),
+vAttribute varchar(50) not null,
+vType varchar(17) not null,
+tDefault text,
+iStringLength int,
+cReferencedTable char(9),
+cOptional char(1) not null,
+cEditable char(1) not null,
+UNIQUE (cProfileCode,vAttribute)
+)
+;
+
+DROP TABLE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`vwMerchantSource`;
+CREATE TABLE `milliscriptmoneyspinnerasxtrial`.`vwMerchantSource`
+(
+tQuery text,
+dLastUpdate datetime
+)
+;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnGenProfileCode`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnGenProfileCode`(OUT ProfileCode char(9))
+BEGIN
+	DECLARE COUNTER INT;
+	SELECT count(cProfileCode) into COUNTER FROM Profile;
+	SET COUNTER=COUNTER+1;
+
+	CASE
+		WHEN COUNTER>=0 and COUNTER<=9 THEN
+		SET ProfileCode=CONCAT('PR000000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9 and COUNTER<=99 THEN
+		SET ProfileCode=CONCAT('PR00000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99 and COUNTER<=999 THEN
+		SET ProfileCode=CONCAT('PR0000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999 and COUNTER<=9999 THEN
+		SET ProfileCode=CONCAT('PR000',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>9999 and COUNTER<=99999 THEN
+		SET ProfileCode=CONCAT('PR00',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>99999 and COUNTER<=999999 THEN
+		SET ProfileCode=CONCAT('PR0',CAST(COUNTER AS CHAR(9)));
+		WHEN COUNTER>999999 THEN SET ProfileCode=CONCAT('PR',CAST(COUNTER AS CHAR(9)));
+	END CASE;
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnInsProfile`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnInsProfile`(IN ProfileCode char(9),IN vAttribute Varchar(50),IN vType Varchar(17),IN cDefault text,IN iStringLength int,IN cReferencedTable char(9),IN cOptional char(1),IN cEditable char(1))
+BEGIN
+	INSERT INTO Profile
+	VALUES(ProfileCode,vAttribute,vType,cDefault,iStringLength,cReferencedTable,cOptional,cEditable);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS `milliscriptmoneyspinnerasxtrial`.`prnUpdMerchantSource`$$
+
+CREATE PROCEDURE `milliscriptmoneyspinnerasxtrial`.`prnUpdMerchantSource`(IN UpdateQuery text)
+BEGIN
+	UPDATE vwMerchantSource
+	SET tQuery=updateQuery,dLastUpdate=NOW();
+END$$
+
+DELIMITER ;
+
+	INSERT INTO `milliscriptmoneyspinnerasxtrial`.`vwMerchantSource`
+	VALUES('',now());
+
+DROP VIEW IF EXISTS `milliscriptmoneyspinnerasxtrial`.`vwProfileCode`;
+
+CREATE VIEW `milliscriptmoneyspinnerasxtrial`.`vwProfileCode`
+AS
+SELECT DISTINCT cProfileCode From Profile;
+
+DROP VIEW IF EXISTS `milliscriptmoneyspinnerasxtrial`.`vwProfile`;
+
+CREATE VIEW `milliscriptmoneyspinnerasxtrial`.`vwProfile`
+AS
+select * from referencetable where cReferenceTableCode IN (SELECT cProfileCode from profile);
+

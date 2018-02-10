@@ -1,3 +1,9 @@
+/*
+*	This file contains MySQL database code for Open MoneySpinner Suite
+*	Ensure to set global sql_mode = ANSI before running this file
+*	Author: Abiodun Aremu
+**/
+
 DROP DATABASE IF EXISTS milliscriptmoneyspinnerasxtrial;
 
 CREATE DATABASE milliscriptmoneyspinnerasxtrial;
